@@ -4,8 +4,7 @@ import argparse, codecs, random, sys, os, time
 from pystyle import Center, Anime, Colors, Colorate, Write, System
 from os.path import isfile
 
-def splashScreen(infolol):
-    args = infolol
+def splashScreen():
     System.Clear()
     System.Title("Crammer - By SpectrixDev <3")
     System.Size(140, 40)
@@ -97,11 +96,17 @@ def main():
 
     try:
         os.system('color')
-        file = splashScreen(args)
+        file = splashScreen()
         System.Clear()
 
         with codecs.open(file, 'r', 'utf-8') as f:
             current_line = ''
+
+            # randomize the order of the rows of text fromthe file seperated by newlines
+            lines = f.readlines()
+            random.shuffle(lines)
+            # Assign it to f again so we can use it again
+            f = lines
 
             for line in f:
                 missing_words = []
@@ -161,7 +166,7 @@ def main():
                     print("\n\n" + current_line)
 
                     try:
-                        guess = input('Enter the next missing word: ')
+                        guess = input('\033[1mEnter the next missing word:\033[0m ')
                     except KeyboardInterrupt:
                         sys.exit(0)
                     except EOFError:
@@ -169,12 +174,13 @@ def main():
 
                     if guess == next_word:
                         System.Clear()
-                        print("\033[92m"+"Correct! The word was '" + next_word + "'.\033[0m")
+                        print(f'\033[92mCorrect! The word was "{next_word}".\033[0m')
                     elif args.tries and tries == args.tries:
                         System.Clear()
-                        print("\033[93m"+"Too many tries. The word was '" + next_word + "'.\033[0m")
+                        print(f'\033[93mToo many tries. The word was "{next_word}".\033[0m')
                     else:
-                        print("Incorrect. Please try again.")
+                        System.Clear()
+                        print(f'\033[93m"{guess}" is incorrect. Please try again.\033[0m')
                         tries += 1
                         continue
 
@@ -185,6 +191,7 @@ def main():
 
                     missing_words.pop(0)
                     tries = 1
+
     except IOError:
         print("File not found: '{}'".format(args.filename))
         
